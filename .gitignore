@@ -1,14 +1,12 @@
 **/.venv
 **/.history
 **/.python-version
-**/data
 **/logs
 *.log
 *.csv
 
 # Ignore raw data files
-data/raw
-data/raw/*
+data/
 
 
 # Ignore Jupyter Notebook checkpoints
