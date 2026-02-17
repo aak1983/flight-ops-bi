@@ -1,3 +1,35 @@
 **/.venv
 **/.history
 **/.python-version
+**/data
+**/logs
+*.log
+*.csv
+
+# Ignore Jupyter Notebook checkpoints
+**/.ipynb_checkpoints
+
+# Ignore Python bytecode files
+**/__pycache__/
+**/*.pyc
+# Ignore IDE-specific files
+.idea/
+.vscode/
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+# Ignore other temporary files
+*.tmp
+*.bak
+*.swp
+# Ignore coverage reports
+coverage/
+*.cover
+# Ignore test results
+test-results/
+*.xml
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
