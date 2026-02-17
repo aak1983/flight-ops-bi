@@ -6,6 +6,11 @@
 *.log
 *.csv
 
+# Ignore raw data files
+data/raw
+data/raw/*
+
+
 # Ignore Jupyter Notebook checkpoints
 **/.ipynb_checkpoints
 
@@ -32,4 +37,5 @@ test-results/
 build/
 dist/
 *.egg-info/
+
 
