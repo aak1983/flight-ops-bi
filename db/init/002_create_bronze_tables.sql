@@ -1,54 +1,66 @@
 -- Track pipeline runs (Bronze)
-CREATE TABLE IF NOT EXISTS bronze.pipeline_runs (
-    run_id uuid PRIMARY KEY,
-    started_at timestamptz NOT NULL DEFAULT now(),
-    finished_at timestamptz,
-    status text NOT NULL CHECK (status IN ('running', 'success','failed')),
-    source_file text NOT NULL,
-    rows_loaded bigint NOT NULL DEFAULT 0
+create table if not exists bronze.pipeline_runs (
+   run_id      uuid primary key,
+   started_at  timestamptz not null default now(),
+   finished_at timestamptz,
+   status      text not null check ( status in ( 'running',
+                                            'success',
+                                            'failed' ) ),
+   source_file text not null,
+   rows_loaded bigint not null default 0
 );
 
 
 -- Raw ingestion table: keep fields as TEXT to avoid load failures.
 -- Add metadata for audit/debug
-CREATE TABLE IF NOT EXISTS bronze.flights_raw (
-    bronze_id bigserial PRIMARY KEY,
-    run_id uuid NOT NULL,
-    loaded_at timestamptz NOT NULL DEFAULT now(),
-    source_file text NOT NULL,
+create table if not exists bronze.flights_raw (
+   bronze_id               bigserial primary key,
+   run_id                  uuid not null,
+   loaded_at               timestamptz not null default now(),
+   source_file             text not null,
 
     -- Raw columns (TEXT).
-    "FL_DATE" text,
-    "AIRLINE_CODE" text,
-    "FL_NUMBER" text,
-    "ORIGIN" text,
-    "DEST" text,
-    "CRS_DEP_TIME" text,
-    "DEP_TIME" text,
-    "DEP_DELAY" text,
-    "TAXI_OUT" text,
-    "WHEELS_OFF" text,
-    "WHEELS_ON" text,
-    "TAXI_IN" text,
-    "CRS_ARR_TIME" text,
-    "ARR_TIME" text,
-    "ARR_DELAY" text,
-    "CANCELLED" text,
-    "CANCELLATION_CODE" text,
-    "DIVERTED" text,
-    "AIR_TIME" text,
-    "DISTANCE" text,
-    "CARRIER_DELAY" text,
-    "WEATHER_DELAY" text,
-    "NAS_DELAY" text,
-    "SECURITY_DELAY" text,
-    "LATE_AIRCRAFT_DELAY" text,
-
-    CONSTRAINT fk_bronze_flights_raw_run
-      FOREIGN KEY (run_id)
-      REFERENCES bronze.pipeline_runs (run_id)
+   fl_date                 text,
+   airline                 text,
+   airline_dot             text,
+   airline_code            text,
+   dot_code                text,
+   fl_number               text,
+   origin                  text,
+   origin_city             text,
+   dest                    text,
+   dest_city               text,
+   crs_dep_time            text,
+   dep_time                text,
+   dep_delay               text,
+   taxi_out                text,
+   wheels_off              text,
+   wheels_on               text,
+   taxi_in                 text,
+   crs_arr_time            text,
+   arr_time                text,
+   arr_delay               text,
+   cancelled               text,
+   cancellation_code       text,
+   diverted                text,
+   crs_elapsed_time        text,
+   elapsed_time            text,
+   air_time                text,
+   distance                text,
+   delay_due_carrier       text,
+   delay_due_weather       text,
+   delay_due_nas           text,
+   delay_due_security      text,
+   delay_due_late_aircraft text,
+   constraint fk_bronze_flights_raw_run foreign key ( run_id )
+      references bronze.pipeline_runs ( run_id )
 );
 
-CREATE INDEX IF NOT EXISTS idx_bronze_flights_raw_run_id ON bronze.flights_raw(run_id);
-CREATE INDEX IF NOT EXISTS idx_bronze_flights_raw_loaded_at ON bronze.flights_raw(loaded_at);
-
+create index if not exists idx_bronze_flights_raw_run_id on
+   bronze.flights_raw (
+      run_id
+   );
+create index if not exists idx_bronze_flights_raw_loaded_at on
+   bronze.flights_raw (
+      loaded_at
+   );

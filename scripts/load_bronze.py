@@ -9,31 +9,38 @@ import psycopg2
 load_dotenv()
 
 RAW_COLUMNS = [
-    'FL_DATE',
-    'AIRLINE_CODE',
-    'FL_NUMBER',
-    'ORIGIN',
-    'DEST',
-    'CRS_DEP_TIME',
-    'DEP_TIME',
-    'DEP_DELAY',
-    'TAXI_OUT',
-    'WHEELS_OFF',
-    'WHEELS_ON',
-    'TAXI_IN',
-    'CRS_ARR_TIME',
-    'ARR_TIME',
-    'ARR_DELAY',
-    'CANCELLED',
-    'CANCELLATION_CODE',
-    'DIVERTED',
-    'AIR_TIME',
-    'DISTANCE',
-    'CARRIER_DELAY',
-    'WEATHER_DELAY',
-    'NAS_DELAY',
-    'SECURITY_DELAY',
-    'LATE_AIRCRAFT_DELAY',
+    "FL_DATE",
+    "AIRLINE",
+    "AIRLINE_DOT",
+    "AIRLINE_CODE",
+    "DOT_CODE",
+    "FL_NUMBER",
+    "ORIGIN",
+    "ORIGIN_CITY",
+    "DEST",
+    "DEST_CITY",
+    "CRS_DEP_TIME",
+    "DEP_TIME",
+    "DEP_DELAY",
+    "TAXI_OUT",
+    "WHEELS_OFF",
+    "WHEELS_ON",
+    "TAXI_IN",
+    "CRS_ARR_TIME",
+    "ARR_TIME",
+    "ARR_DELAY",
+    "CANCELLED",
+    "CANCELLATION_CODE",
+    "DIVERTED",
+    "CRS_ELAPSED_TIME",
+    "ELAPSED_TIME",
+    "AIR_TIME",
+    "DISTANCE",
+    "DELAY_DUE_CARRIER",
+    "DELAY_DUE_WEATHER",
+    "DELAY_DUE_NAS",
+    "DELAY_DUE_SECURITY",
+    "DELAY_DUE_LATE_AIRCRAFT",
 ]
 
 def get_conn():
@@ -45,21 +52,21 @@ def get_conn():
         password=os.getenv("PGPASSWORD", "flightops"),
     )
     
-def create_run(cur: psycopg2.extensions.cursor, rund_id, source_file):
+def create_run(cur: psycopg2.extensions.cursor, run_id, source_file):
     cur.execute(
         """
         INSERT INTO bronze.pipeline_runs (run_id, status, source_file)
         VALUES (%s, 'running', %s)
         """,
-        (str(rund_id), source_file),
+        (str(run_id), source_file),
     )
     
 def finish_run_success(cur, run_id, rows_loaded):
     cur.execute(
         """
         UPDATE bronze.pipeline_runs
-        SET status='success', finished_at=now(), rows_laoded=%s
-        WHERE rund_id=%s
+        SET status='success', finished_at=now(), rows_loaded=%s
+        WHERE run_id=%s
         """,
         (rows_loaded, str(run_id)),
     )
@@ -111,7 +118,7 @@ def main():
             # Insert into bronze with metadata
             insert_sql = f"""
                 INSERT INTO bronze.flights_raw (
-                    rund_id, loaded_at, source_file, {cols_sql}
+                    run_id, loaded_at, source_file, {cols_sql}
                 )
                 SELECT
                     %s, %s, %s, {cols_sql}
