@@ -36,4 +36,4 @@ build/
 dist/
 *.egg-info/
 .env
-
+data/flights_sample_3m.csv

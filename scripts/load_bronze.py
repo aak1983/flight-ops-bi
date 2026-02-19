@@ -90,7 +90,7 @@ def main():
     conn.autocommit = False
     
     try:
-        with conn.cursor as cur:
+        with conn.cursor() as cur:
             create_run(cur, run_id, source_file)
             
             # Temp table to COPY raw columns only (no metadata)
@@ -105,7 +105,7 @@ def main():
             # COPY into temp
             cols_sql = ", ".join(RAW_COLUMNS)
             copy_sql = f"COPY {temp_table} ({cols_sql}) FROM STDIN WITH (FORMAT csv, HEADER true, DELIMITER ',', QUOTE '\"')"
-            with open(csv_path, "r", encoding="uft-8") as f:
+            with open(csv_path, "r", encoding="utf-8") as f:
                 cur.copy_expert(copy_sql, f)
             
             # Insert into bronze with metadata
